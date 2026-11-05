@@ -1,26 +1,26 @@
 # Lean In Circle Recommendation Engine
 
-## System overview
+## What the app does
 
-FastAPI reads members, Circles, topics, and activity from SQLite. A deterministic pipeline filters candidates, scores them, adds variety, and explains each recommendation.
+FastAPI reads members, Circles, topics, and activity from SQLite. It removes unsuitable Circles, scores the rest, adds variety, and explains each suggestion. The same data produces the same results.
 
-The website (`/static/index.html`, also served at `/`) helps nontechnical stakeholders search member profiles and browse readable recommendations. The top-right **Developer API** button opens `/docs`, where engineers can call `/recommendations/{user_id}` and inspect JSON and scoring details. Browser network tools show request timing.
+The website (`/static/index.html`) lets nontechnical teammates search members and browse readable recommendations. The top-right **Developer API** button opens `/docs` to try `/recommendations/{user_id}` and inspect JSON responses and scores. Browser network tools show response times.
 
-## Recommendations and edge cases
+## How recommendations work
 
-The engine excludes already-joined, full, unlisted, archived, and inactive Circles. Activity must fall within 60 days, with at least one post or five chat messages in the supplied 30-day window.
+The app excludes already-joined, full, unlisted, archived, and inactive Circles. A Circle needs activity within 60 days, plus at least one post or five chat messages in the supplied 30-day window.
 
-Personalized ranking balances interests (60%), profile alignment (10%), and community health (30%). Signals include industry, meeting format, recent posts, and chat volume. Missing locations are not guessed. Without stated interests, discovery favors healthy, open communities; leader completeness provides a small boost. Topic-overlap penalties and a two-per-topic cap limit repetition. Each result includes a factual, plain-language explanation.
+Scores combine interests (60%), profile fit (10%), and community health (30%). I chose these weights; the assignment did not provide them. Interests come first, activity matters next, and profile fit plays a smaller role because profiles can be incomplete. These are starting values that I would adjust using real member feedback. They consider industry, meeting format, posts, and chat volume. Missing locations are not guessed. Members without interests receive active, open communities; more complete leader profiles give a small boost. Similar topics receive a penalty, with at most two Circles per main topic. Every result has a factual explanation.
 
-**Why 10 results?** It gives a manageable shortlist and limits response size. Clients can request 1–50. All eligible candidates are still scored, so this does not guarantee sub-50ms latency. The website displays six results at a time.
+**Why limit 10 results as default for OpenAPI?** Ten provides a manageable shortlist and a smaller response. Clients can request 1–50. All eligible Circles are still scored. The website shows six results at a time.
 
-## Tradeoffs
+## Choices and tradeoffs
 
-For a 3–4 hour scope, weighted rules offer straightforward setup, debugging, and explanations without training data or model infrastructure. Request-time scoring avoids maintaining cached feeds and reflects committed capacity changes. Activity counters remain static; the demo uses the dataset’s September 21, 2026 reference date for repeatable results.
+For a 3–4 hour assignment, simple scoring rules are easier to set up, debug, and explain than models needing training data or extra services. Calculating scores on each request avoids maintaining saved recommendation lists and reflects saved capacity changes. Activity totals do not update automatically; the demo uses September 21, 2026 to keep results repeatable.
 
-## Production scale
+## Supporting more users
 
-- Move to PostgreSQL. Retrieve roughly 200 candidates using indexed filters and evaluated pgvector or Elasticsearch search, then rerank. Benchmark latency rather than assume sub-10ms retrieval.
-- Cache onboarding candidates and features in Redis. Use Kafka/SQS workers to refresh activity and membership data.
-- Add authentication, regression tests, monitoring, and transactional capacity checks when joining.
-- Track accepted joins and sustained participation; tune weights through A/B tests while monitoring community exposure.
+- Move to PostgreSQL. Find about 200 suitable Circles using indexed filters and tested pgvector or Elasticsearch search, then rank them. Measure speed rather than assume retrieval takes under 10 milliseconds.
+- Reuse onboarding suggestions and scoring data through Redis. Use Kafka/SQS background workers to update activity and memberships.
+- Add sign-in, automated checks, monitoring, and seat checks that prevent simultaneous joins from exceeding capacity.
+- Measure accepted joins and continued participation. Compare scoring changes through A/B tests and check which communities receive exposure.

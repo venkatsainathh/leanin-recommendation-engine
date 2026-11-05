@@ -1,0 +1,13 @@
+"""Short-lived connections; every request receives its own consistent read snapshot."""
+import sqlite3
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_DB = ROOT / 'circles.sqlite3'
+
+
+def connect(path: Path) -> sqlite3.Connection:
+    connection = sqlite3.connect(path, timeout=10)
+    connection.row_factory = sqlite3.Row
+    connection.execute('PRAGMA foreign_keys = ON')
+    return connection

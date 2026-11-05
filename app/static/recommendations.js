@@ -44,7 +44,7 @@ function card(circle,index) {
   const bottom=element('div','card-bottom'), button=element('button','view-button','Explore Circle ↗');
   button.setAttribute('aria-label',`Explore ${circle.name}`);button.addEventListener('click',()=>details(circle));
   bottom.append(element('span','join-status',circle.join_policy === 'open' ? 'Open to join' : 'Request to join'),button);
-  body.append(element('h3','',circle.name),element('p','description',circle.description || 'A space for connection, shared experiences, and growth.'),reason,facts,bottom);
+  body.append(element('p','recommendation-rank',`Recommendation #${circle.rank}`),element('h3','',circle.name),element('p','description',circle.description || 'A space for connection, shared experiences, and growth.'),reason,facts,bottom);
   node.append(art,body);return node;
 }
 function render() {
@@ -70,7 +70,10 @@ async function load() {
   visible=6;recommendations=[];
   $('greeting').textContent=`Find your people, ${member.first_name}.`;
   $('context').textContent=member.interests.length ? 'Inspired by your interests. Chosen to help you connect and grow.' : 'New beginnings, shared ambitions. Explore active communities to get started.';
-  $('interests').replaceChildren(...member.interests.map(t=>element('span','interest',t)));
+  $('interests-section').hidden = false;
+  $('interests').replaceChildren(...(member.interests.length
+    ? member.interests.map(t => element('span', 'interest', t))
+    : [element('span', 'no-interests', 'No interests added yet — explore active communities below.')]));
   $('cards').replaceChildren();$('cards').setAttribute('aria-busy','true');$('more').hidden=true;$('count').textContent='';
   $('message').replaceChildren(element('div','loading','Finding your next community…'));
   try {

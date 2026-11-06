@@ -4,6 +4,8 @@ A locally runnable Circle recommendation service with a member-friendly web inte
 
 The project uses the supplied synthetic dataset. All members go through the same recommendation rules; the four assignment scenarios are verification cases, not special ranking branches.
 
+**Submission materials:** [Local setup](#quick-start) · [Technical design](DESIGN.md) · [Database schema overview](SCHEMA.md) · [SQL definitions](schema.sql)
+
 ## Contents
 
 - [Quick start](#quick-start)
@@ -28,7 +30,11 @@ The project uses the supplied synthetic dataset. All members go through the same
 
 No Node.js build, Docker, external database, or API key is required. Windows and Linux instructions are provided, but those platforms have not been verified in this project session. The seed importer uses a same-filesystem hard link for atomic publication; use a local filesystem that supports hard links.
 
-Download or clone the repository, then open a terminal in its root directory—the directory containing `requirements.txt` and `seed.py`.
+Clone the repository, then run the commands below from the directory containing your clone. If you already opened a terminal inside the project, skip the first `cd` command.
+
+```sh
+git clone https://github.com/venkatsainathh/leanin-recommendation-engine.git
+```
 
 ### macOS / Linux
 
@@ -108,6 +114,9 @@ leanin-recommendation-engine/
 ├── schema.sql                    # Tables, constraints, and indexes
 ├── seed.py                       # Atomic import of the supplied dataset
 ├── requirements.txt              # Pinned runtime dependencies
+├── tests/test_recommendations.py  # Four assignment scenarios
+├── DESIGN.md
+├── SCHEMA.md
 ├── .gitignore
 └── README.md
 ```
@@ -387,7 +396,7 @@ $env:CLOCK_MODE = "snapshot"
 
 ## Verification
 
-The minimal repository does not currently include a pytest suite or pytest dependencies. The runnable smoke check below uses only Python's standard library against a running server. It checks the actual API and four planted scenarios; it is not a load test or a measure of real-member recommendation quality.
+Run the four scenario tests from the project root with `python -m unittest discover -s tests -v`. They build a temporary database from the supplied dataset and require no running server. The runnable smoke check below uses only Python's standard library against a running server. It checks the actual API and four planted scenarios; it is not a load test or a measure of real-member recommendation quality.
 
 | User | Scenario | Expected outcome |
 |---:|---|---|

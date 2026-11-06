@@ -16,7 +16,7 @@ Scores combine interests (60%), profile fit (10%), and community health (30%). I
 
 ## Choices and tradeoffs
 
-For a 3–4 hour assignment, simple scoring rules are easier to set up, debug, and explain than models needing training data or extra services. Calculating scores on each request avoids maintaining saved recommendation lists and reflects saved capacity changes. Activity totals do not update automatically; the demo uses September 21, 2026 to keep results repeatable.
+For a short assignment, simple scoring rules are easier to set up, debug, and explain than models needing training data or extra services. Calculating scores on each request avoids maintaining saved recommendation lists and reflects saved capacity changes. Activity totals do not update automatically; the demo uses September 21, 2026 to keep results repeatable.
 
 ## Supporting more users
 
